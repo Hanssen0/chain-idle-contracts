@@ -1,64 +1,53 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-library HugeNumLib {
-    int256 constant DECS = 18;
-    int256 constant ONE_N = int256(10) ** uint256(DECS);
-    int256 constant NEG_ONE_N = -ONE_N;
-    int256 constant DECS_N = DECS * ONE_N;
-    int256 constant TEN_N = 10 * ONE_N;
-    int256 constant LN_TEN_N =
-        2302585092994045684 * (int256(10) ** uint256(DECS - 18));
-    int256 constant ONE_P_TWO_N = 12 * (int256(10) ** uint256(DECS - 1));
-    int256 constant LN_ONE_P_TWO_N =
-        182321556793954600 * (int256(10) ** uint256(DECS - 18));
-    int256 constant MAX_EXP = 10 ** 5;
-    int256 constant MAX_EXP_N = MAX_EXP * ONE_N;
-    int256 constant MAX_EXP_EXP_N = 5 * ONE_N;
-    int256 constant PREC_EXP_N = 18 * ONE_N;
-    int256 constant NEG_PREC_EXP_N = -PREC_EXP_N;
-    int256 constant MAX_PREC_EXP_N = MAX_EXP_EXP_N + PREC_EXP_N;
-    int256 constant LOG_10_2 =
-        301029995662919568 * (int256(10) ** uint256(DECS - 18));
-    int256 constant LOG_10_3 =
-        477121254719662368 * (int256(10) ** uint256(DECS - 18));
-    int256 constant LOG_10_4 =
-        602059991327940775 * (int256(10) ** uint256(DECS - 18));
-    int256 constant LOG_10_5 =
-        698970004334375752 * (int256(10) ** uint256(DECS - 18));
-    int256 constant LOG_10_6 =
-        778151250382000569 * (int256(10) ** uint256(DECS - 18));
-    int256 constant LOG_10_7 =
-        845098040014161479 * (int256(10) ** uint256(DECS - 18));
-    int256 constant LOG_10_8 =
-        903089986991943361 * (int256(10) ** uint256(DECS - 18));
-    int256 constant LOG_10_9 =
-        954242509439324737 * (int256(10) ** uint256(DECS - 18));
+struct HugeNum {
+    int mantissa;
+    int depth;
+    int exponent;
+}
 
-    struct HugeNum {
-        int256 mantissa;
-        int256 depth;
-        int256 exponent;
-    }
+library HugeNumLib {
+    int constant DECS = 18;
+    int constant ONE_N = int(10) ** uint(DECS);
+    int constant NEG_ONE_N = -ONE_N;
+    int constant DECS_N = DECS * ONE_N;
+    int constant TEN_N = 10 * ONE_N;
+    int constant LN_TEN_N = 2302585092994045684 * (int(10) ** uint(DECS - 18));
+    int constant ONE_P_TWO_N = 12 * (int(10) ** uint(DECS - 1));
+    int constant LN_ONE_P_TWO_N =
+        182321556793954600 * (int(10) ** uint(DECS - 18));
+    int constant MAX_EXP = 10 ** 5;
+    int constant MAX_EXP_N = MAX_EXP * ONE_N;
+    int constant MAX_EXP_EXP_N = 5 * ONE_N;
+    int constant PREC_EXP_N = 18 * ONE_N;
+    int constant NEG_PREC_EXP_N = -PREC_EXP_N;
+    int constant MAX_PREC_EXP_N = MAX_EXP_EXP_N + PREC_EXP_N;
+    int constant LOG_10_2 = 301029995662919568 * (int(10) ** uint(DECS - 18));
+    int constant LOG_10_3 = 477121254719662368 * (int(10) ** uint(DECS - 18));
+    int constant LOG_10_4 = 602059991327940775 * (int(10) ** uint(DECS - 18));
+    int constant LOG_10_5 = 698970004334375752 * (int(10) ** uint(DECS - 18));
+    int constant LOG_10_6 = 778151250382000569 * (int(10) ** uint(DECS - 18));
+    int constant LOG_10_7 = 845098040014161479 * (int(10) ** uint(DECS - 18));
+    int constant LOG_10_8 = 903089986991943361 * (int(10) ** uint(DECS - 18));
+    int constant LOG_10_9 = 954242509439324737 * (int(10) ** uint(DECS - 18));
     using HugeNumLib for HugeNum;
 
-    function ONE() internal pure returns (HugeNum memory) {
-        HugeNum memory one;
+    function ONE() internal pure returns (HugeNum memory one) {
         one.mantissa = 1;
         one.depth = 1;
         one.exponent = 0;
-        return one;
     }
 
-    function toSci(int256 value) internal pure returns (int256, int256) {
+    function toSci(int value) internal pure returns (int, int) {
         if (value == 0) {
             return (0, 0);
         }
 
-        int256 sign = value < 0 ? -1 : int256(1);
+        int sign = value < 0 ? -1 : int(1);
         unchecked {
             value *= sign;
-            int256 expR = 0;
+            int expR = 0;
             while (value >= TEN_N) {
                 value /= 10;
                 expR += ONE_N;
@@ -72,12 +61,12 @@ library HugeNumLib {
         }
     }
 
-    function lnInt(int256 x) internal pure returns (int256) {
-        int256 sign = x < 0 ? -1 : int256(1);
+    function lnInt(int x) internal pure returns (int) {
+        int sign = x < 0 ? -1 : int(1);
         unchecked {
             x *= sign;
 
-            int256 log = 0;
+            int log = 0;
             while (x >= TEN_N) {
                 log = log + LN_TEN_N;
                 x = x / 10;
@@ -87,8 +76,8 @@ library HugeNumLib {
                 x = (x * 5) / 6;
             }
             x = x - ONE_N;
-            int256 y = x;
-            int256 i = 1;
+            int y = x;
+            int i = 1;
             while (i < 13) {
                 log = log + y / i;
                 i = i + 1;
@@ -102,16 +91,16 @@ library HugeNumLib {
         }
     }
 
-    function log10Int(int256 x) internal pure returns (int256) {
+    function log10Int(int x) internal pure returns (int) {
         unchecked {
             return (lnInt(x) * ONE_N) / LN_TEN_N;
         }
     }
 
-    function _tenPow(int256 x) internal pure returns (uint256) {
+    function _tenPow(int x) internal pure returns (uint) {
         unchecked {
-            uint256 l = uint256(x / ONE_N);
-            int256 r = x - int256(l) * ONE_N;
+            uint l = uint(x / ONE_N);
+            int r = x - int(l) * ONE_N;
             if (r < LOG_10_2) {
                 return 10 ** l;
             }
@@ -140,38 +129,38 @@ library HugeNumLib {
         }
     }
 
-    function tenPow(int256 x) internal pure returns (int256) {
+    function tenPow(int x) internal pure returns (int) {
         if (x == 0) {
             return ONE_N;
         }
 
         unchecked {
-            if (x < PREC_EXP_N) {
+            if (x < NEG_PREC_EXP_N) {
                 return 0;
             }
 
             if (x < 0) {
-                return ONE_N / int256(_tenPow(-x));
+                return ONE_N / int(_tenPow(-x));
             }
 
-            return ONE_N * int256(_tenPow(x));
+            return ONE_N * int(_tenPow(x));
         }
     }
 
     function expSub(
         HugeNum memory a,
         HugeNum memory b
-    ) internal pure returns (int256) {
+    ) internal pure returns (int) {
         unchecked {
-            int256 depthDiff = a.depth - b.depth;
+            int depthDiff = a.depth - b.depth;
             if (depthDiff <= -2) {
                 return NEG_PREC_EXP_N;
             }
             if (depthDiff >= 2) {
                 return PREC_EXP_N;
             }
-            int256 aExp = a.exponent;
-            int256 bExp = b.exponent;
+            int aExp = a.exponent;
+            int bExp = b.exponent;
             if (depthDiff == -1) {
                 if (bExp > MAX_PREC_EXP_N) {
                     return NEG_PREC_EXP_N;
@@ -184,7 +173,7 @@ library HugeNumLib {
                 }
                 aExp = tenPow(aExp);
             }
-            int256 expDiff = aExp - bExp;
+            int expDiff = aExp - bExp;
             if (expDiff >= PREC_EXP_N) {
                 return PREC_EXP_N;
             }
@@ -195,7 +184,7 @@ library HugeNumLib {
         }
     }
 
-    function addExp(HugeNum memory value, int256 expI) internal pure {
+    function addExp(HugeNum memory value, int expI) internal pure {
         if (expI == 0) {
             return;
         }
@@ -218,7 +207,7 @@ library HugeNumLib {
     }
 
     function norm(HugeNum memory value) internal pure {
-        (int256 mantissa, int256 expR) = toSci(value.mantissa);
+        (int mantissa, int expR) = toSci(value.mantissa);
         value.mantissa = mantissa;
 
         value.addExp(expR);
@@ -229,22 +218,21 @@ library HugeNumLib {
         value.mantissa = 1;
     }
 
-    function exp(HugeNum memory value) internal pure returns (HugeNum memory) {
-        HugeNum memory expR;
+    function exp(
+        HugeNum memory value
+    ) internal pure returns (HugeNum memory expR) {
         if (value.depth == 1) {
             expR.mantissa = value.exponent;
             expR.depth = 1;
             expR.exponent = 0;
             expR.norm();
-            return expR;
+        } else {
+            expR.mantissa = ONE_N;
+            unchecked {
+                expR.depth = value.depth - 1;
+            }
+            expR.exponent = value.exponent;
         }
-
-        expR.mantissa = ONE_N;
-        unchecked {
-            expR.depth = value.depth - 1;
-        }
-        expR.exponent = value.exponent;
-        return expR;
     }
 
     function gt(
@@ -260,7 +248,7 @@ library HugeNumLib {
         }
 
         unchecked {
-            int256 depthDiff = a.depth - b.depth;
+            int depthDiff = a.depth - b.depth;
             if (depthDiff >= 2) {
                 return a.mantissa > 0;
             }
@@ -268,8 +256,8 @@ library HugeNumLib {
                 return a.mantissa <= 0;
             }
 
-            int256 aExp = a.exponent;
-            int256 bExp = b.exponent;
+            int aExp = a.exponent;
+            int bExp = b.exponent;
             if (depthDiff == 1) {
                 if (aExp > MAX_PREC_EXP_N) {
                     return a.mantissa > 0;
@@ -293,7 +281,7 @@ library HugeNumLib {
     }
 
     function _inc(HugeNum memory self, HugeNum memory value) internal pure {
-        int256 expSubR = self.expSub(value);
+        int expSubR = self.expSub(value);
         if (expSubR == PREC_EXP_N) {
             return;
         }
@@ -339,7 +327,7 @@ library HugeNumLib {
 
     function multiply(HugeNum memory self, HugeNum memory value) internal pure {
         unchecked {
-            (int256 mantissa, int256 mExp) = toSci(
+            (int mantissa, int mExp) = toSci(
                 (self.mantissa * value.mantissa) / ONE_N
             );
             self.mantissa = mantissa;
@@ -365,7 +353,7 @@ library HugeNumLib {
 
     function divide(HugeNum memory self, HugeNum memory value) internal pure {
         unchecked {
-            (int256 mantissa, int256 mExp) = toSci(
+            (int mantissa, int mExp) = toSci(
                 (self.mantissa * ONE_N) / value.mantissa
             );
             self.mantissa = mantissa;
@@ -387,5 +375,12 @@ library HugeNumLib {
 
             self.norm();
         }
+    }
+
+    function fromUint(uint value) internal pure returns (HugeNum memory res) {
+        res.mantissa = int(value) * ONE_N;
+        res.depth = 1;
+        res.exponent = 0;
+        res.norm();
     }
 }

@@ -5,7 +5,8 @@
   "scripts": {
     "build": "hardhat compile",
     "test": "hardhat test",
-    "test:gas": "UPDATE_SNAPSHOT=1 yarn test --grep gas",
+    "test:gas": "REPORT_GAS=1 yarn test",
+    "test:cov": "hardhat coverage",
     "clean": "rm -rf ./artifacts ./cache ./typechain-types"
   },
   "devDependencies": {
