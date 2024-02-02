@@ -2,6 +2,9 @@
 pragma solidity ^0.8.20;
 
 import {HugeNumLib, HugeNum} from "./utils/HugeNum.sol";
+import {GameConstants} from "./GameConstants.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 using HugeNumLib for HugeNum;
 
@@ -23,31 +26,14 @@ struct PlayerStatus {
 error BadRequest();
 error InsufficientIdeas();
 
-contract Game {
-    HugeNum INIT_LIMIT;
-    HugeNum INIT_COST;
-    HugeNum X_MULTIPLIER;
-    HugeNum X_COST_PER_LEVEL;
-
+contract Game is OwnableUpgradeable, UUPSUpgradeable {
     mapping(address => PlayerStatus) public playersStatus;
 
-    constructor() {
-        INIT_LIMIT.mantissa = HugeNumLib.ONE_N;
-        INIT_LIMIT.depth = 1;
-        INIT_LIMIT.exponent = 6 * HugeNumLib.ONE_N;
-
-        INIT_COST.mantissa = (45 * HugeNumLib.ONE_N) / 10;
-        INIT_COST.depth = 1;
-        INIT_COST.exponent = 4 * HugeNumLib.ONE_N;
-
-        X_MULTIPLIER.mantissa = 5 * HugeNumLib.ONE_N;
-        X_MULTIPLIER.depth = 1;
-        X_MULTIPLIER.exponent = 1 * HugeNumLib.ONE_N;
-
-        X_COST_PER_LEVEL.mantissa = HugeNumLib.ONE_N;
-        X_COST_PER_LEVEL.depth = 1;
-        X_COST_PER_LEVEL.exponent = 3 * HugeNumLib.ONE_N;
+    function initialize(address owner) external initializer {
+        __Ownable_init(owner);
     }
+
+    function _authorizeUpgrade(address newImpl) internal override onlyOwner {}
 
     function assertInitedPlayer()
         internal
@@ -60,7 +46,9 @@ contract Game {
         }
     }
 
-    function getPlayer(address player) external view returns (PlayerStatus memory) {
+    function getPlayer(
+        address player
+    ) external view returns (PlayerStatus memory) {
         return playersStatus[player];
     }
 
@@ -72,12 +60,8 @@ contract Game {
         }
 
         HugeNum memory blocks = blocksReq;
-        if (blocks.gt(INIT_LIMIT)) {
-            revert BadRequest();
-        }
-
-        HugeNum memory initCost = INIT_COST;
-        if (initCost.gt(blocks)) {
+        HugeNum memory initCost = GameConstants.getInitCost();
+        if (blocks.gt(GameConstants.getInitLimit()) || initCost.gt(blocks)) {
             revert BadRequest();
         }
 
@@ -94,7 +78,7 @@ contract Game {
 
     function _updateBlocks(PlayerStatus storage status) internal {
         HugeNum memory x = HugeNumLib.fromUint(status.xLevel);
-        x.multiply(X_MULTIPLIER);
+        x.multiply(GameConstants.getXMultiplier());
         x.multiply(
             HugeNumLib.fromUint(
                 (block.timestamp - status.lastTimestamp) * status.dt
@@ -124,8 +108,10 @@ contract Game {
 
         _updateBlocks(status);
 
-        HugeNum memory cost = X_COST_PER_LEVEL;
-        cost.multiply(HugeNumLib.fromUint(status.xLevel));
+        uint256 xLevel = status.xLevel;
+
+        HugeNum memory cost = GameConstants.getXCostPerLevel();
+        cost.multiply(HugeNumLib.fromUint(xLevel));
 
         HugeNum memory ideas = status.ideas;
         if (cost.gt(ideas)) {
@@ -134,7 +120,7 @@ contract Game {
         ideas.dec(cost);
         status.ideas = ideas;
         unchecked {
-            status.xLevel += 1;
+            status.xLevel = xLevel + 1;
         }
     }
 }

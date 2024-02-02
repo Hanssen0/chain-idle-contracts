@@ -2,24 +2,35 @@ import {
   loadFixture,
   time,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { expect } from "chai";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { Game } from "../typechain-types";
 
 async function deployFixture() {
-  const Game = await ethers.getContractFactory("Game");
-  const game = await Game.deploy();
+  const [owner] = await ethers.getSigners();
 
-  return { game };
+  const Game = await ethers.getContractFactory("Game");
+  const game = await upgrades.deployProxy(Game, [owner.address], {
+    initializer: "initialize",
+    kind: "uups",
+  });
+
+  return { game: game as unknown as Game };
 }
 
 describe("Game", () => {
   describe("Deployment", () => {
-    it("Should be deployed", async () => {
-      const { game } = await loadFixture(deployFixture);
+    let game: Game;
+    let owner: HardhatEthersSigner;
 
-      expect(game).to.not.equal(null);
+    before(async () => {
+      game = (await loadFixture(deployFixture)).game;
+      owner = (await ethers.getSigners())[0];
+    });
+
+    it("Should be deployed with owner set", async () => {
+      expect(await game.owner()).to.equal(owner.address);
     });
   });
 

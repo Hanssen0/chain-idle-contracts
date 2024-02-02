@@ -1,11 +1,35 @@
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
+import { getDeployed, saveToFile } from "./utils";
 
 async function main() {
-  const game = await ethers.deployContract("Game");
+  const [owner] = await ethers.getSigners();
+
+  const Game = await ethers.getContractFactory("Game");
+
+  const deployed = await getDeployed("Game");
+
+  const game = await (() => {
+    if (deployed) {
+      return upgrades.upgradeProxy(deployed, Game, { kind: "uups" });
+    }
+    return upgrades.deployProxy(Game, [owner.address], {
+      initializer: "initialize",
+      kind: "uups",
+    });
+  })();
 
   await game.waitForDeployment();
+  const address = await game.getAddress();
 
-  console.log(`Game deployed to ${game.target}`);
+  await saveToFile(
+    { address, owner: owner.address },
+    "Game"
+  );
+  if (deployed) {
+    console.log(`Game upgraded. ${address}`);
+  } else {
+    console.log(`Game deployed. ${address}`);
+  }
 }
 
 main().catch((error) => {

@@ -97,7 +97,7 @@ library HugeNumLib {
         }
     }
 
-    function _tenPow(int x) internal pure returns (uint) {
+    function _tenPow(int x) private pure returns (uint) {
         unchecked {
             uint l = uint(x / ONE_N);
             int r = x - int(l) * ONE_N;
@@ -280,7 +280,7 @@ library HugeNumLib {
         }
     }
 
-    function _inc(HugeNum memory self, HugeNum memory value) internal pure {
+    function _inc(HugeNum memory self, HugeNum memory value) private pure {
         int expSubR = self.expSub(value);
         if (expSubR == PREC_EXP_N) {
             return;
@@ -309,13 +309,13 @@ library HugeNumLib {
     }
 
     function inc(HugeNum memory self, HugeNum memory value) internal pure {
-        self._inc(value);
+        _inc(self, value);
         self.norm();
     }
 
-    function _dec(HugeNum memory self, HugeNum memory value) internal pure {
+    function _dec(HugeNum memory self, HugeNum memory value) private pure {
         value.mantissa = -value.mantissa;
-        self._inc(value);
+        _inc(self, value);
         value.mantissa = -value.mantissa;
     }
 
@@ -333,9 +333,9 @@ library HugeNumLib {
             self.mantissa = mantissa;
 
             HugeNum memory expR = self.exp();
-            expR._inc(value.exp());
+            _inc(expR, value.exp());
             if (mExp == ONE_N) {
-                expR._inc(ONE());
+                _inc(expR, ONE());
             }
 
             if (expR.depth == 1 && expR.exponent < MAX_EXP_EXP_N) {
@@ -359,9 +359,9 @@ library HugeNumLib {
             self.mantissa = mantissa;
 
             HugeNum memory expR = self.exp();
-            expR._dec(value.exp());
+            _dec(expR, value.exp());
             if (mExp == NEG_ONE_N) {
-                expR._dec(ONE());
+                _dec(expR, ONE());
             }
 
             if (expR.depth == 1 && expR.exponent < MAX_EXP_EXP_N) {

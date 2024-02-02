@@ -1,0 +1,11 @@
+{
+  "address": "0x52F2db2D0fe58559F185B883cfF668039b057035",
+  "deployments": [
+    {
+      "implementation": "0xd8e6b16E93E70a32fFAb22Bf962b94078B457575",
+      "date": "2024-02-02T14:57:43.614Z",
+      "address": "0x52F2db2D0fe58559F185B883cfF668039b057035",
+      "owner": "0xDA93960cc0E23A5aedB9c36E05E3633C7dE49E19"
+    }
+  ]
+}

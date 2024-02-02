@@ -1,0 +1,181 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [
+    {
+      "address": "0x52F2db2D0fe58559F185B883cfF668039b057035",
+      "txHash": "0x1c90da4ebfe2733a02fdfd8a300387a296e4aa0b389583a3bd5a5d97ce8e33e0",
+      "kind": "uups"
+    }
+  ],
+  "impls": {
+    "b5b36864037f518cf979a225f9fbdac93ae7436db357bc456225285683f3537a": {
+      "address": "0xd8e6b16E93E70a32fFAb22Bf962b94078B457575",
+      "txHash": "0x1a1a789cf0debbe9c2850c9a4d42b880326f3b05f56b694784171cb433fe2699",
+      "layout": {
+        "solcVersion": "0.8.24",
+        "storage": [
+          {
+            "label": "playersStatus",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_address,t_struct(PlayerStatus)1399_storage)",
+            "contract": "Game",
+            "src": "contracts/Game.sol:30"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)64_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnableStorage)14_storage": {
+            "label": "struct OwnableUpgradeable.OwnableStorage",
+            "members": [
+              {
+                "label": "_owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_int256": {
+            "label": "int256",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(PlayerStatus)1399_storage)": {
+            "label": "mapping(address => struct PlayerStatus)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(HugeNum)1893_storage": {
+            "label": "struct HugeNum",
+            "members": [
+              {
+                "label": "mantissa",
+                "type": "t_int256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "depth",
+                "type": "t_int256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "exponent",
+                "type": "t_int256",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(PlayerStatus)1399_storage": {
+            "label": "struct PlayerStatus",
+            "members": [
+              {
+                "label": "lastTimestamp",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "stage",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "blocks",
+                "type": "t_struct(HugeNum)1893_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "ideas",
+                "type": "t_struct(HugeNum)1893_storage",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "dt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "xLevel",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "9"
+              }
+            ],
+            "numberOfBytes": "320"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.Ownable": [
+            {
+              "contract": "OwnableUpgradeable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
